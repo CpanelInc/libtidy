@@ -15,7 +15,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0: tidy-%{snap}cvs.tar.gz
 Source1: tab2space.1
-Source10: tidy-cvs_checkout.sh
 
 Patch0: tidy-20091203cvs-format.patch
 
