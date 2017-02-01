@@ -1,17 +1,22 @@
-
-%define libname libtidy
+%define ns_prefix ea
+%define pkg_base  libtidy
+%define pkg_name  %{ns_prefix}-%{pkg_base}
+%define _prefix   /opt/cpanel/%{pkg_base}
+%define _unpackaged_files_terminate_build 0
 
 %define snap 20091203
 
-Name:    tidy
+Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 0.99.0
-Release: 31.%{snap}%{?dist}
+# Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
+%define release_prefix 32
+Release: %{release_prefix}%{?dist}.cpanel
+Vendor: cPanel, Inc.
 
 Group:   Applications/Text
 License: W3C
 URL:     http://tidy.sourceforge.net/
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0: tidy-%{snap}cvs.tar.gz
 Source1: tab2space.1
@@ -22,7 +27,7 @@ BuildRequires: libtool
 BuildRequires: doxygen
 BuildRequires: libxslt
 
-Requires: %{libname}%{?_isa} = %{version}-%{release}
+Provides:  libtidy = %{version}-%{release}
 
 %description
 When editing HTML it's easy to make mistakes. Wouldn't it be nice if
@@ -34,19 +39,15 @@ specialized HTML editors and conversion tools, and can help you
 identify where you need to pay further attention on making your pages
 more accessible to people with disabilities.
 
-%package -n %{libname}
-Summary: Shared libraries for %{name}
-Group:   System Environment/Libraries
-%description -n %{libname}
-%{summary}.
-
-%package -n %{libname}-devel
+%package devel
 Summary: Development files for %{name}
 Group:   Development/Libraries
 Obsoletes: tidy-devel < 0.99.0-10
 Provides:  tidy-devel = %{version}-%{release}
-Requires: %{libname}%{?_isa} = %{version}-%{release}
-%description -n %{libname}-devel
+Obsoletes: libtidy-devel < 0.99.0-10
+Provides:  libtidy-devel = %{version}-%{release}
+Requires: %{pkg_name} = %{version}-%{release}
+%description devel
 %{summary}.
 
 
@@ -101,9 +102,9 @@ cd test
 ./testall.sh
 mv testone.sh{~,}
 
-%post -n %{libname} -p /sbin/ldconfig
+%post -n %{pkg_name} -p /sbin/ldconfig
 
-%postun -n %{libname} -p /sbin/ldconfig
+%postun -n %{pkg_name} -p /sbin/ldconfig
 
 
 %files
@@ -114,11 +115,11 @@ mv testone.sh{~,}
 %{_mandir}/man1/tidy.1*
 %{_mandir}/man1/tab2space.1*
 
-%files -n %{libname}
+%files -n %{pkg_name}
 %defattr(-,root,root,-)
 %{_libdir}/libtidy-0.99.so.0*
 
-%files -n %{libname}-devel
+%files -n %{pkg_name}-devel
 %defattr(-,root,root,-)
 %doc htmldoc/api/*
 %{_includedir}/*.h
@@ -126,6 +127,9 @@ mv testone.sh{~,}
 
 
 %changelog
+* Tue Jan 31 2017 Cory McIntire <cory@cpanel.net> - 0.99.0-32
+- EA-5419: repackage for use as an EA4 RPM
+
 * Tue Dec 03 2013 Pavel Raiskup <praiskup@redhat.com> - 0.99.0-31.20091203
 - silence gcc's warnings for -Werror=format-string (#1037356)
 
