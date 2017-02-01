@@ -10,7 +10,7 @@ Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 0.99.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 32
+%define release_prefix 33
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -117,16 +117,22 @@ mv testone.sh{~,}
 
 %files -n %{pkg_name}
 %defattr(-,root,root,-)
+%dir %{_prefix}
+%dir %{_libdir}
 %{_libdir}/libtidy-0.99.so.0*
 
 %files -n %{pkg_name}-devel
 %defattr(-,root,root,-)
+%dir %{_prefix}/include
 %doc htmldoc/api/*
 %{_includedir}/*.h
 %{_libdir}/libtidy.so
 
 
 %changelog
+* Wed Feb 01 2017 Dan Muey <dan@cpanel.net> - 0.99.0-33
+- EA-5935: properly cleanup empty dirs when removed
+
 * Tue Jan 31 2017 Cory McIntire <cory@cpanel.net> - 0.99.0-32
 - EA-5419: repackage for use as an EA4 RPM
 
