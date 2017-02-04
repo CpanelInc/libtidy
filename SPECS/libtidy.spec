@@ -10,7 +10,7 @@ Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 0.99.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 33
+%define release_prefix 34
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -106,6 +106,13 @@ mv testone.sh{~,}
 
 %postun -n %{pkg_name} -p /sbin/ldconfig
 
+%postun -n %{pkg_name}-devel
+if [ -d %{_prefix}/share/doc ]; then
+    /bin/rmdir --ignore-fail-on-non-empty %{_prefix}/share/doc
+fi
+if [ -d %{_prefix}/share ]; then
+    /bin/rmdir --ignore-fail-on-non-empty %{_prefix}/share
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -130,6 +137,9 @@ mv testone.sh{~,}
 
 
 %changelog
+* Wed Feb 01 2017 Dan Muey <dan@cpanel.net> - 0.99.0-34
+- EA-5945: clean -devel paths that may or may not exist in post uninstall
+
 * Wed Feb 01 2017 Dan Muey <dan@cpanel.net> - 0.99.0-33
 - EA-5935: properly cleanup empty dirs when removed
 
