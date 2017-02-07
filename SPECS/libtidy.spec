@@ -10,7 +10,7 @@ Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 0.99.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 34
+%define release_prefix 35
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -27,7 +27,7 @@ BuildRequires: libtool
 BuildRequires: doxygen
 BuildRequires: libxslt
 
-Provides:  libtidy = %{version}-%{release}
+Provides: %{pkg_name} = %{version}-%{release}
 
 %description
 When editing HTML it's easy to make mistakes. Wouldn't it be nice if
@@ -42,10 +42,7 @@ more accessible to people with disabilities.
 %package devel
 Summary: Development files for %{name}
 Group:   Development/Libraries
-Obsoletes: tidy-devel < 0.99.0-10
-Provides:  tidy-devel = %{version}-%{release}
-Obsoletes: libtidy-devel < 0.99.0-10
-Provides:  libtidy-devel = %{version}-%{release}
+Provides: %{pkg_name}-devel = %{version}-%{release}
 Requires: %{pkg_name} = %{version}-%{release}
 %description devel
 %{summary}.
@@ -137,6 +134,9 @@ fi
 
 
 %changelog
+* Mon Feb 06 2017 Dan Muey <dan@cpanel.net> - 0.99.0-35
+- EA-5946: Change Provides to ea4 specific name so yum does not tie in non ea4 libtidy
+
 * Wed Feb 01 2017 Dan Muey <dan@cpanel.net> - 0.99.0-34
 - EA-5945: clean -devel paths that may or may not exist in post uninstall
 
