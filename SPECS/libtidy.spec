@@ -4,9 +4,6 @@
 %define _prefix   /opt/cpanel/%{pkg_base}
 %define _unpackaged_files_terminate_build 0
 
-# we have to do this because libtidy always builds to …/lib and %files barfs if you hard code …/lib
-%define _prefix_tidylib %{_prefix}/lib
-
 Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 5.4.0
@@ -50,15 +47,12 @@ Requires: %{pkg_name} = %{version}-%{release}
 %build
 
 cd build/cmake
-cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/cpanel/libtidy
+cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/cpanel/libtidy -DLIB_INSTALL_DIR=%{_lib}
 
 %install
 
 cd build/cmake
 make install DESTDIR=$RPM_BUILD_ROOT
-
-# See _prefix_tidylib
-ln -sf /opt/cpanel/libtidy/lib $RPM_BUILD_ROOT/opt/cpanel/libtidy/lib64
 
 %files
 %defattr(-,root,root,-)
@@ -67,9 +61,8 @@ ln -sf /opt/cpanel/libtidy/lib $RPM_BUILD_ROOT/opt/cpanel/libtidy/lib64
 %dir %{_prefix}/bin
 %attr(0755,root,root) %{_prefix}/bin/tidy
 
-%{_prefix}/lib64
-%dir %{_prefix_tidylib}
-%{_prefix_tidylib}/libtidy*
+%dir %{_prefix}/%{_lib}
+%{_prefix}/%{_lib}/libtidy*
 
 %files -n %{pkg_name}-devel
 %defattr(-,root,root,-)
