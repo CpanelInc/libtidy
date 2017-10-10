@@ -4,13 +4,11 @@
 %define _prefix   /opt/cpanel/%{pkg_base}
 %define _unpackaged_files_terminate_build 0
 
-%define snap 20091203
-
 Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
-Version: 0.99.0
+Version: 5.4.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 35
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -18,14 +16,9 @@ Group:   Applications/Text
 License: W3C
 URL:     http://tidy.sourceforge.net/
 
-Source0: tidy-%{snap}cvs.tar.gz
-Source1: tab2space.1
+Source0: https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-html5-5.4.0.tar.gz
 
-Patch0: tidy-20091203cvs-format.patch
-
-BuildRequires: libtool
-BuildRequires: doxygen
-BuildRequires: libxslt
+BuildRequires: cmake
 
 Provides: %{pkg_name} = %{version}-%{release}
 
@@ -49,91 +42,38 @@ Requires: %{pkg_name} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{name}
-%patch0 -p1 -b .format
-
-# htmldocs included in cvs checkout
-#setup -q -n %{name} -T -D -b1
-
-sh build/gnuauto/setup.sh
-
+%setup -n tidy-html5-%{version}
 
 %build
-%configure \
-  --disable-static \
-  --disable-dependency-tracking
 
-make %{?_smp_mflags}
-
-# api docs
-doxygen htmldoc/doxygen.cfg
-
-# make doc steps gleaned from build/gmake/Makefile
-pushd htmldoc
-../console/tidy -xml-config > tidy-config.xml
-../console/tidy -xml-help   > tidy-help.xml
-xsltproc -o tidy.1 tidy1.xsl tidy-help.xml
-xsltproc -o quickref.html quickref-html.xsl tidy-config.xml
-popd
-
+cd build/cmake
+cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/cpanel/libtidy -DLIB_INSTALL_DIR=%{_lib}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
+cd build/cmake
 make install DESTDIR=$RPM_BUILD_ROOT
-
-install -p -m644 -D htmldoc/tidy.1 $RPM_BUILD_ROOT%{_mandir}/man1/tidy.1
-install -p -m644  %{SOURCE1} $RPM_BUILD_ROOT%{_mandir}/man1/
-
-## Unpackaged files
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib*.la
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-%check
-cp test/testone.sh{,~}
-sed -i 's|TIDY=../bin/tidy|TIDY=../console/tidy|' test/testone.sh
-cd test
-./testall.sh
-mv testone.sh{~,}
-
-%post -n %{pkg_name} -p /sbin/ldconfig
-
-%postun -n %{pkg_name} -p /sbin/ldconfig
-
-%postun -n %{pkg_name}-devel
-if [ -d %{_prefix}/share/doc ]; then
-    /bin/rmdir --ignore-fail-on-non-empty %{_prefix}/share/doc
-fi
-if [ -d %{_prefix}/share ]; then
-    /bin/rmdir --ignore-fail-on-non-empty %{_prefix}/share
-fi
 
 %files
 %defattr(-,root,root,-)
-%doc htmldoc/*.html htmldoc/*.css htmldoc/*.gif
-%{_bindir}/tab2space
-%{_bindir}/tidy
-%{_mandir}/man1/tidy.1*
-%{_mandir}/man1/tab2space.1*
-
-%files -n %{pkg_name}
-%defattr(-,root,root,-)
 %dir %{_prefix}
-%dir %{_libdir}
-%{_libdir}/libtidy-0.99.so.0*
+
+%dir %{_prefix}/bin
+%attr(0755,root,root) %{_prefix}/bin/tidy
+
+%dir %{_prefix}/%{_lib}
+%{_prefix}/%{_lib}/libtidy*
 
 %files -n %{pkg_name}-devel
 %defattr(-,root,root,-)
-%dir %{_prefix}/include
-%doc htmldoc/api/*
-%{_includedir}/*.h
-%{_libdir}/libtidy.so
 
+%dir %{_prefix}/include
+%{_prefix}/include/*.h
 
 %changelog
+* Mon Sep 25 2017 Dan Muey <dan@cpanel.net> - 5.4.0-1
+- EA-6819: Update libtidy from 0.99.0 to 5.4.0
+
 * Mon Feb 06 2017 Dan Muey <dan@cpanel.net> - 0.99.0-35
 - EA-5946: Change Provides to ea4 specific name so yum does not tie in non ea4 libtidy
 
