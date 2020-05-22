@@ -8,7 +8,7 @@ Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 5.4.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -71,6 +71,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_prefix}/include/*.h
 
 %changelog
+* Fri May 22 2020 Julian Brown <julian.brown@cpanel.net> - 5.4.0-2
+- ZC-6850: Fix for C8
+
 * Mon Sep 25 2017 Dan Muey <dan@cpanel.net> - 5.4.0-1
 - EA-6819: Update libtidy from 0.99.0 to 5.4.0
 
