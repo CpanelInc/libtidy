@@ -19,6 +19,11 @@ URL:     http://tidy.sourceforge.net/
 Source0: https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-html5-5.4.0.tar.gz
 
 BuildRequires: cmake
+%if 0%{?rhel} >= 8
+BuildRequires: brotli
+BuildRequires: libnghttp2
+%global debug_package %{nil}
+%endif
 
 Provides: %{pkg_name} = %{version}-%{release}
 
