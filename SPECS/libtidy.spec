@@ -8,7 +8,7 @@ Name:    %{pkg_name}
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 5.4.0
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 
@@ -22,7 +22,6 @@ BuildRequires: cmake
 %if 0%{?rhel} >= 8
 BuildRequires: brotli
 BuildRequires: libnghttp2
-%global debug_package %{nil}
 %endif
 
 Provides: %{pkg_name} = %{version}-%{release}
@@ -76,6 +75,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_prefix}/include/*.h
 
 %changelog
+* Tue May 09 2023 Brian Mendoza <brian.mendoza@cpanel.net> - 5.4.0-3
+- ZC-10936: Clean up Makefile and remove debug-package-nil
+
 * Fri May 22 2020 Julian Brown <julian.brown@cpanel.net> - 5.4.0-2
 - ZC-6850: Fix for C8
 
